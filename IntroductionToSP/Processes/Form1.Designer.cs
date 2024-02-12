@@ -33,6 +33,7 @@
             this.buttonStop = new System.Windows.Forms.Button();
             this.labelProcessInfo = new System.Windows.Forms.Label();
             this.myProcess = new System.Diagnostics.Process();
+            this.lvProcesses = new System.Windows.Forms.ListView();
             this.SuspendLayout();
             // 
             // buttonStart
@@ -55,8 +56,6 @@
             // 
             // buttonStop
             // 
-            this.buttonStop.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonStop.Location = new System.Drawing.Point(312, 45);
             this.buttonStop.Name = "buttonStop";
             this.buttonStop.Size = new System.Drawing.Size(75, 23);
@@ -68,7 +67,7 @@
             // labelProcessInfo
             // 
             this.labelProcessInfo.AutoSize = true;
-            this.labelProcessInfo.Location = new System.Drawing.Point(13, 75);
+            this.labelProcessInfo.Location = new System.Drawing.Point(407, 13);
             this.labelProcessInfo.Name = "labelProcessInfo";
             this.labelProcessInfo.Size = new System.Drawing.Size(68, 13);
             this.labelProcessInfo.TabIndex = 2;
@@ -84,11 +83,25 @@
             this.myProcess.StartInfo.UserName = "";
             this.myProcess.SynchronizingObject = this;
             // 
+            // lvProcesses
+            // 
+            this.lvProcesses.FullRowSelect = true;
+            this.lvProcesses.HideSelection = false;
+            this.lvProcesses.Location = new System.Drawing.Point(12, 74);
+            this.lvProcesses.MultiSelect = false;
+            this.lvProcesses.Name = "lvProcesses";
+            this.lvProcesses.Size = new System.Drawing.Size(375, 206);
+            this.lvProcesses.TabIndex = 3;
+            this.lvProcesses.UseCompatibleStateImageBehavior = false;
+            this.lvProcesses.View = System.Windows.Forms.View.Details;
+            this.lvProcesses.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvProcesses_MouseClick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(399, 292);
+            this.ClientSize = new System.Drawing.Size(729, 292);
+            this.Controls.Add(this.lvProcesses);
             this.Controls.Add(this.labelProcessInfo);
             this.Controls.Add(this.richTextBoxProcessName);
             this.Controls.Add(this.buttonStop);
@@ -98,6 +111,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_Closing);
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -107,6 +121,7 @@
         private System.Windows.Forms.Button buttonStop;
         private System.Windows.Forms.Label labelProcessInfo;
         private System.Diagnostics.Process myProcess;
+        private System.Windows.Forms.ListView lvProcesses;
     }
 }
 

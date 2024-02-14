@@ -8,12 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Processes
 {
     public partial class Form1 : Form
     {
         //List<Process> processList;
+        [DllImport("user32.dll")]
+        public static extern int SetForegroundWindow(IntPtr hwnd);
 
         public Form1()
         {
@@ -120,6 +123,11 @@ namespace Processes
             finally
             {
                 lvProcesses.Items.Remove(lvProcesses.SelectedItems[0]);
+                if (lvProcesses.Items.Count != 0)
+                {
+                    myProcess = Process.GetProcessById(Convert.ToInt32(lvProcesses.Items[lvProcesses.Items.Count - 1].Text));
+                    SetForegroundWindow(myProcess.MainWindowHandle);
+                }
             }
 
             Info();
@@ -153,6 +161,7 @@ namespace Processes
             try
             {
                 idProcess = Convert.ToInt32(lvProcesses.SelectedItems[0].Text);
+
             }
             catch (ArgumentOutOfRangeException)
             {
@@ -184,7 +193,7 @@ namespace Processes
             labelProcessInfo.Text += $"Threads:                 {myProcess.Threads.Count}\n";
         }
 
-        private void lvProcesses_MouseClick(object sender, MouseEventArgs e)
+        private void lvProcesses_SelectedIndexChanged(object sender, EventArgs e)
         {
             Info();
         }

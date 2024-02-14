@@ -94,7 +94,7 @@
             this.lvProcesses.TabIndex = 3;
             this.lvProcesses.UseCompatibleStateImageBehavior = false;
             this.lvProcesses.View = System.Windows.Forms.View.Details;
-            this.lvProcesses.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvProcesses_MouseClick);
+            this.lvProcesses.SelectedIndexChanged += new System.EventHandler(this.lvProcesses_SelectedIndexChanged);
             // 
             // Form1
             // 

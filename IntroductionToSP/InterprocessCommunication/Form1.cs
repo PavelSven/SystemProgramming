@@ -26,20 +26,42 @@ namespace InterprocessCommunication
         List<Process> processes = new List<Process>();
         int count = 0;
 
+        string path;
+        public string Path
+        {
+            get { return path; }
+            set 
+            { 
+                path = value;
+                listBoxAssemblies.Items.Clear();
+                LoadAvailableAssemblies(path); 
+            }
+        }
+
         public Form1()
         {
             InitializeComponent();
-            LoadAvailableAssemblies();
+            Path = Application.StartupPath;
+            //LoadAvailableAssemblies(Path);
 
+            buttonStart.Enabled = false;
             buttonStop.Enabled = false;
             buttonCloseWindow.Enabled = false;
         }
 
-        void LoadAvailableAssemblies()
+        void LoadAvailableAssemblies(string path)
         {
             string except = new FileInfo(Application.ExecutablePath).Name;
             except.Substring(0, except.IndexOf("."));
-            string[] files = Directory.GetFiles(Application.StartupPath, "*.lnk");
+
+            LoadFilesByType(path, "*.exe", except);
+            LoadFilesByType(path, "*.lnk", except);
+        }
+
+        void LoadFilesByType(string path, string format, string except)
+        {
+            string[] files = Directory.GetFiles(path, format);
+
             //string[] files = Directory.GetFiles(@"C:\Windows\System32", "*.exe");
 
             foreach (string file in files)
@@ -52,18 +74,21 @@ namespace InterprocessCommunication
 
         void RunProcess(string assemblyName)
         {
+            if (assemblyName.Length == 0 || assemblyName == null)
+                return;
+
             //Process proc = Process.Start(assemblyName);
             Process proc = Process.Start(assemblyName);
 
             processes.Add(proc);
             if (Process.GetCurrentProcess().Id == GetParentProcessId(proc.Id))
             {
-                MessageBox.Show(
+/*                MessageBox.Show(
                     this,
                     proc.ProcessName + " дочерний процесс текущего процесса.",
                     "Info",
                     MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                    MessageBoxIcon.Information);*/
                 proc.EnableRaisingEvents = true;
                 proc.Exited += Proc_Exited;
                 SendMessage(proc.MainWindowHandle, WM_SETTEXT, 0, $"Child process #{count++}");
@@ -178,6 +203,13 @@ namespace InterprocessCommunication
             {
                 proc.Kill();
             }
+        }
+
+        private void buttonChooseDirectory_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            dialog.ShowDialog();
+            Path = dialog.SelectedPath;
         }
     }
 }

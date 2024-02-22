@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace Processes
 {
@@ -18,15 +19,18 @@ namespace Processes
         [DllImport("user32.dll")]
         public static extern int SetForegroundWindow(IntPtr hwnd);
 
+        List<Process> processes;
+
         public Form1()
         {
             InitializeComponent();
 
-            //processList = new List<Process>();
             //InitProcess();
+            processes = new List<Process>();
             lvProcesses.Columns.Add("PID");
             lvProcesses.Columns.Add("Name");
 
+            LoadAllProcesses();
         }
 
         void Form1_Closing(object sender, CancelEventArgs e) 
@@ -41,7 +45,7 @@ namespace Processes
                         }
                         processList.Clear();*/
 
-            while (lvProcesses.Items.Count > 0)
+/*            while (lvProcesses.Items.Count > 0)
             {
                 try
                 {
@@ -56,19 +60,55 @@ namespace Processes
                 {
                     lvProcesses.Items.RemoveAt(0);
                 }
-            }
+            }*/
         }
 
         void InitProcess()
         {
             AlignText();
-            myProcess = new Process();
-            myProcess.StartInfo = new System.Diagnostics.ProcessStartInfo(richTextBoxProcessName.Text);
-            myProcess.Start();
+            Process process = new Process();
+            process.StartInfo = new System.Diagnostics.ProcessStartInfo(richTextBoxProcessName.Text);
+            process.Start();
             //processList.Add(myProcess);
+            processes.Add(process);
 
-            lvProcesses.Items.Add(myProcess.Id.ToString());
-            lvProcesses.Items[lvProcesses.Items.Count - 1].SubItems.Add(myProcess.ProcessName);
+            lvProcesses.Items.Add(process.Id.ToString());
+            lvProcesses.Items[lvProcesses.Items.Count - 1].SubItems.Add(process.ProcessName);
+
+            process.EnableRaisingEvents = true;
+            process.Exited += Proc_Exited;
+        }
+
+        private void Proc_Exited(object sender, EventArgs e)
+        {
+            Process proc = sender as Process;
+
+            //lvProcesses.Items.RemoveAt(lvProcesses.Items.IndexOfKey(proc.Id.ToString()));
+            lvProcesses.Items.RemoveByKey(proc.Id.ToString());
+            processes.Remove(proc);
+        }
+
+        void LoadAllProcesses()
+        {
+            Process[] processesCurrent = Process.GetProcesses();
+            foreach (Process process in processesCurrent) 
+            {
+                if (processes.Find(p => p.Id == process.Id) != default(Process))
+                    continue;
+
+                lvProcesses.Items.Add(process.Id.ToString());
+                lvProcesses.Items[lvProcesses.Items.Count - 1].SubItems.Add(process.ProcessName);
+                processes.Add(process);
+
+                try
+                {
+                    process.EnableRaisingEvents = true;
+                    process.Exited += Proc_Exited;
+                }
+                catch (Win32Exception)
+                {
+                }
+            }
         }
 
         void AlignText()
@@ -110,25 +150,28 @@ namespace Processes
                 return;
             }
 
-            try
-            {
-                myProcess = Process.GetProcessById(idProcess);
+            /*            try
+                        {
+                            myProcess = Process.GetProcessById(idProcess);
 
-                myProcess.CloseMainWindow();
-                myProcess.Close();
-            }
-            catch(ArgumentException)
-            {
-            }
-            finally
-            {
-                lvProcesses.Items.Remove(lvProcesses.SelectedItems[0]);
-                if (lvProcesses.Items.Count != 0)
-                {
-                    myProcess = Process.GetProcessById(Convert.ToInt32(lvProcesses.Items[lvProcesses.Items.Count - 1].Text));
-                    SetForegroundWindow(myProcess.MainWindowHandle);
-                }
-            }
+                            myProcess.CloseMainWindow();
+                            myProcess.Close();
+                        }
+                        catch(ArgumentException)
+                        {
+                        }
+                        finally
+                        {
+                            lvProcesses.Items.Remove(lvProcesses.SelectedItems[0]);
+                            if (lvProcesses.Items.Count != 0)
+                            {
+                                myProcess = Process.GetProcessById(Convert.ToInt32(lvProcesses.Items[lvProcesses.Items.Count - 1].Text));
+                                SetForegroundWindow(myProcess.MainWindowHandle);
+                            }
+                        }*/
+
+            lvProcesses.Items.Remove(lvProcesses.SelectedItems[0]);
+            processes.Remove(processes.First(proc => proc.Id == idProcess));
 
             Info();
         }
@@ -156,6 +199,7 @@ namespace Processes
                         }*/
 
             labelProcessInfo.Text = "";
+            labelCountProcesses.Text = $"Количество процессов: {lvProcesses.Items.Count}";
 
             int idProcess;
             try
@@ -179,22 +223,37 @@ namespace Processes
                 labelProcessInfo.Text = "Процесс уже закрыт";
                 return;
             }
-
+       
             labelProcessInfo.Text += "Process info:\n";
             labelProcessInfo.Text += $"PID:                     {myProcess.Id}\n";
-            labelProcessInfo.Text += $"Base priority:           {myProcess.BasePriority}\n";
-            labelProcessInfo.Text += $"Priority Class:          {myProcess.PriorityClass}\n";
-            labelProcessInfo.Text += $"Start time:              {myProcess.StartTime}\n";
-            labelProcessInfo.Text += $"Total Processor Time:    {myProcess.TotalProcessorTime}\n";
-            labelProcessInfo.Text += $"User Processor Time:     {myProcess.UserProcessorTime}\n";
-            labelProcessInfo.Text += $"Session Id:              {myProcess.SessionId}\n";
             labelProcessInfo.Text += $"Name:                    {myProcess.ProcessName}\n";
-            labelProcessInfo.Text += $"Processor Affinity:      {myProcess.ProcessorAffinity}\n";
+            labelProcessInfo.Text += $"Base priority:           {myProcess.BasePriority}\n";
+            labelProcessInfo.Text += $"Session Id:              {myProcess.SessionId}\n";
             labelProcessInfo.Text += $"Threads:                 {myProcess.Threads.Count}\n";
+            labelProcessInfo.Text += $"Machine name:            {myProcess.MachineName}\n";
+            try
+            {
+                labelProcessInfo.Text += $"Priority Class:          {myProcess.PriorityClass}\n";
+                labelProcessInfo.Text += $"Start time:              {myProcess.StartTime}\n";
+                labelProcessInfo.Text += $"Total Processor Time:    {myProcess.TotalProcessorTime}\n";
+                labelProcessInfo.Text += $"User Processor Time:     {myProcess.UserProcessorTime}\n";
+                labelProcessInfo.Text += $"Processor Affinity:      {myProcess.ProcessorAffinity}\n";
+            }
+            catch (Exception)
+            {
+            }
+
         }
 
         private void lvProcesses_SelectedIndexChanged(object sender, EventArgs e)
         {
+            Info();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            //lvProcesses.Items.Clear();
+            LoadAllProcesses();
             Info();
         }
     }

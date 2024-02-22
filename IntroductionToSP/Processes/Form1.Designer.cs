@@ -28,12 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.buttonStart = new System.Windows.Forms.Button();
             this.richTextBoxProcessName = new System.Windows.Forms.RichTextBox();
             this.buttonStop = new System.Windows.Forms.Button();
             this.labelProcessInfo = new System.Windows.Forms.Label();
             this.myProcess = new System.Diagnostics.Process();
             this.lvProcesses = new System.Windows.Forms.ListView();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.labelCountProcesses = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // buttonStart
@@ -67,7 +70,7 @@
             // labelProcessInfo
             // 
             this.labelProcessInfo.AutoSize = true;
-            this.labelProcessInfo.Location = new System.Drawing.Point(407, 13);
+            this.labelProcessInfo.Location = new System.Drawing.Point(406, 35);
             this.labelProcessInfo.Name = "labelProcessInfo";
             this.labelProcessInfo.Size = new System.Drawing.Size(68, 13);
             this.labelProcessInfo.TabIndex = 2;
@@ -85,22 +88,40 @@
             // 
             // lvProcesses
             // 
+            this.lvProcesses.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.lvProcesses.FullRowSelect = true;
             this.lvProcesses.HideSelection = false;
             this.lvProcesses.Location = new System.Drawing.Point(12, 74);
             this.lvProcesses.MultiSelect = false;
             this.lvProcesses.Name = "lvProcesses";
-            this.lvProcesses.Size = new System.Drawing.Size(375, 206);
+            this.lvProcesses.Size = new System.Drawing.Size(375, 506);
             this.lvProcesses.TabIndex = 3;
             this.lvProcesses.UseCompatibleStateImageBehavior = false;
             this.lvProcesses.View = System.Windows.Forms.View.Details;
             this.lvProcesses.SelectedIndexChanged += new System.EventHandler(this.lvProcesses_SelectedIndexChanged);
             // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Interval = 3000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // labelCountProcesses
+            // 
+            this.labelCountProcesses.AutoSize = true;
+            this.labelCountProcesses.Location = new System.Drawing.Point(406, 13);
+            this.labelCountProcesses.Name = "labelCountProcesses";
+            this.labelCountProcesses.Size = new System.Drawing.Size(129, 13);
+            this.labelCountProcesses.TabIndex = 4;
+            this.labelCountProcesses.Text = "Количество процессов: ";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(729, 292);
+            this.ClientSize = new System.Drawing.Size(729, 606);
+            this.Controls.Add(this.labelCountProcesses);
             this.Controls.Add(this.lvProcesses);
             this.Controls.Add(this.labelProcessInfo);
             this.Controls.Add(this.richTextBoxProcessName);
@@ -122,6 +143,8 @@
         private System.Windows.Forms.Label labelProcessInfo;
         private System.Diagnostics.Process myProcess;
         private System.Windows.Forms.ListView lvProcesses;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label labelCountProcesses;
     }
 }
 

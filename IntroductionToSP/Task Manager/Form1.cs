@@ -16,6 +16,7 @@ namespace Task_Manager
     public partial class Form1 : Form
     {
         List<Process> processes;
+        PerformanceCounter myAppCpu;
 
         SortOrder sortOrder = SortOrder.None;
         int columnSort = 0;
@@ -29,6 +30,7 @@ namespace Task_Manager
             listViewProcesses.Columns.Add("PID");
             listViewProcesses.Columns.Add("Name");
             listViewProcesses.Columns.Add("Memory");
+            listViewProcesses.Columns.Add("CPU %");
             
             InitAllProcesses();
             InitListViewProcesses(processes);
@@ -45,25 +47,31 @@ namespace Task_Manager
         {
             listViewProcesses.Items.Clear();
 
-            foreach (Process process in processes)
-            {
+            /*            foreach (Process process in processes)
+                        {
+                            try
+                            {
+                                //process.EnableRaisingEvents = true;
+                                //process.Exited += new EventHandler(Proc_Exited);
+                            }
+                            catch (Exception) { }
 
-                try
-                {
-                    //process.EnableRaisingEvents = true;
-                    //process.Exited += new EventHandler(Proc_Exited);
-                }
-                catch (Exception) { }
+                            myAppCpu =
+                            new PerformanceCounter(
+                                "Process", "% Processor Time", process.ProcessName, true);
 
-                ListViewItem item = new ListViewItem(process.Id.ToString());
-                item.SubItems.Add(process.ProcessName);
-                item.SubItems.Add((process.WorkingSet64 / 1024 / 1024).ToString());
+                            ListViewItem item = new ListViewItem(process.Id.ToString());
+                            item.SubItems.Add(process.ProcessName);
+                            item.SubItems.Add((process.WorkingSet64 / 1024 / 1024).ToString());         
+                            item.SubItems.Add(myAppCpu.NextValue().ToString());
 
-                listViewProcesses.Items.Add(item);
-            }
+                            listViewProcesses.Items.Add(item);
+                        }
 
-            listViewProcesses.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            labelCountProcesses.Text = $"Количество: {listViewProcesses.Items.Count}";
+                        listViewProcesses.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                        labelCountProcesses.Text = $"Количество: {listViewProcesses.Items.Count}";*/
+
+            listViewProcesses.DataBindings.Add(new Binding("Items", processes, "ProcessName"));
         }
 
         void InitProcess(string name)

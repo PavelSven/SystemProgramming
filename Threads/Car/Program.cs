@@ -23,7 +23,9 @@ namespace Car
             //engine.Info();
 
             Car car = new Car(10, 40, 250);
+
             car.Info();
+            Console.WriteLine();
             car.Control();
         }
     }

@@ -18,6 +18,7 @@ namespace Car
         struct Threads
         {
             public Thread PanelThread { get; set; }
+            public Thread EngineThread { get; set; }
         }
         Threads threads;
 
@@ -46,6 +47,19 @@ namespace Car
             threads.PanelThread.Join();
             Console.Clear();
             Console.WriteLine("You are out of the car");
+        }
+
+        public void StartEngine()
+        {
+            engine.Start();
+            threads.EngineThread = new Thread(EngineWorking);
+            threads.EngineThread.Start();
+        }
+
+        public void StopEngine() 
+        {
+            engine.Stop();
+            threads.EngineThread.Join();
         }
 
         public  void Control()
@@ -78,6 +92,11 @@ namespace Car
                             Console.WriteLine("Get out of the car");
                         }
                         break;
+                    case ConsoleKey.E:
+                        if (!engine.Started) StartEngine();
+                        else
+                            StopEngine();
+                        break;
                 }
             } while (key != ConsoleKey.Escape);
         }
@@ -89,6 +108,22 @@ namespace Car
                 Console.Clear();
                 Console.WriteLine($"Fuel level: {tank.FuelLevel} liters");
                 Console.WriteLine($"Engine is {(engine.Started ? "started" : "stopped")}");
+                if (tank.FuelLevel < 5) Console.WriteLine("o LOW FUEL");
+                Thread.Sleep(1000);
+            }
+        }
+
+        void EngineWorking()
+        {
+            while(engine.Started)
+            {
+                if (!tank.TrySpend(engine.ConsumptionPerSecond))
+                {
+                    Console.WriteLine("Fuel ran out");
+                    Thread.Sleep(1000);
+                    engine.Stop();
+                    return;
+                }
                 Thread.Sleep(1000);
             }
         }
